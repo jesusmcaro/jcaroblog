@@ -15,6 +15,15 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
+## pelican-ipynb
+MARKUP = ("md", "ipynb")
+
+from pelican_jupyter import markup as nb_markup
+PLUGINS = [nb_markup]
+IPYNB_MARKUP_USE_FIRST_CELL = True
+
+IGNORE_FILES = [".ipynb_checkpoints"]
+
 # Blogroll
 LINKS = (('Pelican', 'https://getpelican.com/'),
          ('Python.org', 'https://www.python.org/'),
