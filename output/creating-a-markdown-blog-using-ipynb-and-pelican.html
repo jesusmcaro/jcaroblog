@@ -1184,14 +1184,115 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
  .highlight pre  .il { color: #666666 } /* Literal.Number.Integer.Long */</style><body><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Welcome-to-my-new-blog!">Welcome to my new blog!<a class="anchor-link" href="#Welcome-to-my-new-blog!">&#182;</a></h2>
+<h3 id="Welcome-to-my-new-blog!">Welcome to my new blog!<a class="anchor-link" href="#Welcome-to-my-new-blog!">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>For those of you that don't know me or stumbled upon my new blog, let me introduce myself. I'm Jesus (Jesse) Caro, and I have been working in the data space for about 7 years as of 2023. When I started out of grad school, my primary language was R. I had a great blog written in R (powered by <a href="https://github.com/rstudio/blogdown">blogdown</a>) that you can find <a href="https://607f9ef90597535dcfdc202c--jolly-wright-eba598.netlify.app/portfolio/">here</a>.</p>
+<p>However, after a couple of years, I moved to a new role and picked up Python. I have been primarily programming in Python, and that blog was left neglected for a few years. It was primarily a mixture of laziness, and the lack of a solution equivalent to R-blogdown in Python. This is where <a href="https://getpelican.com">Pelican</a> and <a href="https://github.com/danielfrg/pelican-jupyter">pelican-jupyter</a> come to the rescue.</p>
 
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="What-is-Pelican?">What is Pelican?<a class="anchor-link" href="#What-is-Pelican?">&#182;</a></h3><p>Pelican is a static site generator that allows users to leverage Python to create simple static sites. It has a variety of different features, and you can find more about them <a href="https://getpelican.com">here</a>. The requirements for my blog were only these:</p>
+<ul>
+<li>It should have a rich template base with decent-looking templates.</li>
+<li>Allow me to generate a static website using ipynb files.</li>
+<li>It should be fairly approachable over a span of a few months, and I shouldn't have to finagle and remember how to reuse it.</li>
+</ul>
+<p>I would say Pelican knocks it out of the park on the latter two requirements, but the first one is definitely very lackluster. I found some decent templates, but you're going to have to do some digging if you want your blog to not look like it came straight out of the 00's.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="How-can-you-get-started?">How can you get started?<a class="anchor-link" href="#How-can-you-get-started?">&#182;</a></h3><p>Getting started on Pelican is pretty easy. To generate this website I just had to do four things:</p>
+<ul>
+<li>Set up Pelican</li>
+<li>Grab a Template</li>
+<li>Install and set up pelican-jupyter</li>
+<li>Upload the output to a Static Host<ul>
+<li>(optional) If you want a domain name, set one up through GoDaddy </li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Set-up-Pelican">Set up Pelican<a class="anchor-link" href="#Set-up-Pelican">&#182;</a></h3><p>Setting up Pelican is a breeze! Before diving in, I suggest creating a virtual environment for your blog and printing out the requirements.txt file using pip freeze with explicit package versions (in case you migrate machines).</p>
+<p>Navigate to a directory where you'll store your website data. For me, it's <code>/Users/jcaro-work/VSCODE</code>.</p>
+<p>Create a virtual environment above that directory: <code>/Users/jcaro-work/blog-venv</code> by running <code>python -m venv blog-env</code>.</p>
+<p>Activate the environment.</p>
+<p>Run <code>python -m pip install "pelican[markdown]"</code></p>
+<p>Now, let's run and follow the prompts:</p>
+
+<pre><code>mkdir -p ~/projects/yoursite
+cd ~/projects/yoursite
+pelican-quickstart</code></pre>
+<p>Voila! You should now have a directory filled with config files, a content folder, and an output folder.</p>
+<h4 id="Grab-a-Template">Grab a Template<a class="anchor-link" href="#Grab-a-Template">&#182;</a></h4><p>A treasure trove of Pelican themes awaits in the <a href="https://github.com/getpelican/pelican-themes">repository-of-repositories</a>. Currently, I'm using the "Hyde" theme (though it might change in the future). It's a modern and easy-to-use template that you might enjoy. Choose the one that best fits your style!</p>
+<p>Theming is a breeze! In your <code>pelicanconf.py</code> file (created by <code>pelican-quickstart</code>), point to your theme by changing the parameter:</p>
+
+<pre><code>THEME = "/home/user/pelican-themes/theme-name"</code></pre>
+<h4 id="Setting-up-Pelican-Jupyter">Setting up Pelican-Jupyter<a class="anchor-link" href="#Setting-up-Pelican-Jupyter">&#182;</a></h4><p>Setting up pelican-jupyter is also a piece of cake! Just use <code>pip install pelican-jupyter</code>. Ensure your environment meets the following requirements:</p>
+
+<pre><code>pelican&gt;=4
+notebook&gt;=6
+nbconvert&gt;=5</code></pre>
+<p>Now, let's configure the way you want to use <code>.ipynb</code> files. Check out the [repo-readme] (<a href="https://github.com/danielfrg/pelican-jupyter">https://github.com/danielfrg/pelican-jupyter</a>) for various options. I've chosen Option 2 (metadata cell in notebook).</p>
+<p>This requires you to add this code-chunk to <code>pelicanconf.py</code>:</p>
+
+<pre><code>MARKUP = ("md", "ipynb")
+
+from pelican_jupyter import markup as nb_markup
+PLUGINS = [nb_markup]
+IPYNB_MARKUP_USE_FIRST_CELL = True
+
+IGNORE_FILES = [".ipynb_checkpoints"]</code></pre>
+<p>Now, all that's left is to create a <code>.ipynb</code> file in <code>blog/content</code>, and you're good to go!</p>
+<p>To do that, create an <code>.ipynb</code> file with the following metadata:</p>
+
+<pre><code>- title: Wow, Pelican is Cool!
+- author: Bon Jon Bovine
+- date: 2096-04-21
+- category: snek
+- tags: cool-stuff, awesome, tech, isn't-this-great?</code></pre>
+<p>Hit save, and run <code>pelican -rl</code>. You'll see an output like this:</p>
+
+<pre><code>--- AutoReload Mode: Monitoring `content`, `theme` and `settings` for changes. ---
+Serving site at: http://127.0.0.1:8000 - Tap CTRL-C to stop</code></pre>
+<p>Now you should be able to see your website!</p>
+<h4 id="Upload-the-output-to-a-Static-Host">Upload the output to a Static Host<a class="anchor-link" href="#Upload-the-output-to-a-Static-Host">&#182;</a></h4><p>Apart from serving your website at <code>http://127.0.0.1:8000</code>, Pelican generates a static website at <code>blog/output</code>. You'll find tons of files there. You can upload this folder to services like Netlify or GitHub Pages.</p>
+<p>The simplest way I've found is to use GitHub Pages. Define a directory in a parent folder (above the blog), copy the output there, and simply commit and push to the directory linked to GitHub Pages. This way, GitHub will refresh your static website without accessing any external websites.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h3><p>Pelican proves to be a user friendly and quick static site generator, allowing bloggers to focus on content creation rather than complex setup. By following simple steps, users can set up a virtual environment and install Pelican with ease. Additionally, Pelican-Jupyter integration enhances data-driven stories by leveraging Jupyter notebooks to present insights simply.</p>
+<p>While theme selection may be a bit frustrating, Pelican's adaptability ensures users can customize their websites to reflect their unique style and preferences. With the website generated, it can be hosted on platforms like Netlify or GitHub Pages, and the latter offers a simple and efficient way to refresh the static website with every commit.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="#">#<a class="anchor-link" href="##">&#182;</a></h2>
 </div>
 </div>
 </div>
