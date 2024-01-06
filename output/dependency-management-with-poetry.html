@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="Hello! My name is Jesus Caro, I am a Data Engineer with 6 years of experience in Data Engineering, analytics and data science. This blog is a collection of things I find interesting, as well as some personal stuff!">
+	<meta property="og:description" content="Hello! My name is Jesus Caro, I am a Data Engineer with 6 years of experience in Data Engineering, analytics and data science. This blog is a collection of things I find interesting, as well as some personal stuff!">
+	<meta property="og:title" content="Fablr package development with Poetr- Dependency Management, Versioning and Publishing." />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="/dependency-management-with-poetry.html" />
+		<meta property="og:image" content="/images/me.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>Jesus Caro's Blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="/theme/css/poole.css" />
+		<link rel="stylesheet" href="/theme/css/hyde.css" />
+		<link rel="stylesheet" href="/theme/css/syntax.css" />
+			<script src="https://use.fontawesome.com/ada6f22d07.js" crossorigin="anonymous"></script>
+
+		<!-- Feeds -->
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-theme-base-08">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="/images/me.png">
+					Jesus Caro's Blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">Hello! My name is Jesus Caro, I am a Data Engineer with 6 years of experience in Data Engineering, analytics and data science. This blog is a collection of things I find interesting, as well as some personal stuff! </p>
+			<p></p>
+		</div>
+			<ul class="sidebar-nav">
+			</ul>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="#" target="_blank">
+						<i class="fa fa-You can add links in your config file"></i>
+					</a>
+					<a class="sidebar-social-item" href="#" target="_blank">
+						<i class="fa fa-Another social link"></i>
+					</a>
+			<a class="sidebar-social-item" href="/">
+				<i class="fa fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">Fablr package development with Poetr- Dependency Management, Versioning and Publishing.</h1>
+	<span class="post-date">Wed 03 January 2024</span>
+	<h2>Introduction:</h2>
+<p>A short while ago I wrote an article detailing how to create, manage, and build your own development container using Docker, VSCode and GitHub Codespaces, as well as some cool tweaks that allow you to auto-install extensions, etc. In that article, I was working on a toy package I’m developing called <strong><em>*</em></strong><strong><em>Fablr</em></strong><strong><em>*</em></strong>. I also briefly touched upon  creating a virtual environment using Poetry. </p>
+<p>This article is a continuation on that article and details how you can leverage Poetry to create and manage a python package, as well as it’s dependencies, and ultimately how to publish it. There are several python packaging packages (pack-ception), that are available and commonly used across the python eco-system. However, <em>Poetry</em> and <em>setuptools</em> are the most commonly used python packaging tools, with <strong><em>*</em>*Poetry</strong>**** being the one I’m most familiar with.</p>
+<p><img alt="Credit: Pyopensci.org
+" src="images/poetry/Untitled.png"></p>
+<p>Credit: <a href="https://www.pyopensci.org/python-package-guide/package-structure-code/python-package-build-tools.html">Pyopensci.org</a></p>
+<h3>Outline:</h3>
+<p>In this article we won’t elaborate over every single apect of poetry, but we will detail what you need to get up and running to build your own package, manage it’s dependencies, and if you’re happy, ultimately publish your package.</p>
+<p>To do this we’ll go over:</p>
+<ul>
+<li>What is Poetry and how does it work?</li>
+<li>How can you create a package?<ul>
+<li>poetry-init</li>
+</ul>
+</li>
+<li>How can you manage dependencies?<ul>
+<li>adding dependencies</li>
+<li>pinning dependencies</li>
+<li><code>poetry.lock</code></li>
+</ul>
+</li>
+<li>Managing your project and using the virtual environment.<ul>
+<li>virtual environments</li>
+</ul>
+</li>
+<li>Building a wheel.</li>
+<li>Publish to PyPI, or your own private repo.</li>
+</ul>
+<h3>What is Poetry and how does it work?</h3>
+<p>As we previously mentioned, poetry is a python packaging tool that allows you to manage and track dependencies, create virtual environments, manage versioning, build, and publish your package.</p>
+<p>Poetry works primarily by using two files that are created when you initialize your package using <code>poetry new package_name</code> . These files <code>pyproject.toml</code> and <code>poetry.lock</code> are what dictate which dependencies are installed, and how those dependencies get resolved. Furthermore, these files also dictate how poetry manages your virtual environment(s) that are automatically created when you initialize your package.</p>
+<p><strong><em>*</em></strong><strong><em>*</em>NOTE </strong><strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em></strong><strong>USE A VIRTUAL ENVIORNMENT</strong><strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em></strong><strong>:</strong> Before we start creating our repo it’s worth noting that poetry suggests you use an isolated environment (like it’s own virtual environment) so that poetry is isolated from the rest of your system. I would go even further and create a development container for your project, as we did in our previous article. This will make sure that you, and other contributors are developing on identical environments. To see how to do this, you can read my earlier article <a href="https://jesuscaro.org/development-containers-in-vscode-and-github-codespaces.html">here</a>.</p>
+<h3>How do you create a project?</h3>
+<p>First, we should create a directory and repo for our project. I named mine Fablr, and created a repo using GitHub. It’s public and you can find it <a href="https://github.com/jesusmcaro/Fablr">here</a>. After creating a dev container, and mounting an instance of VSCode to my dev container, all that was left was to install poetry using pip. ( I did this automatically using the postcreate.sh script that runs after creating my development container) protip: you should probably pin your poetry version if you’re using a similar method as well.</p>
+<div class="highlight"><pre><span></span><code><span class="n">pip</span> <span class="n">install</span> <span class="n">poetry</span>
+</code></pre></div>
+
+<p>Once poetry is installed, all that is left is to initialize your project, to initialize Fablr, all I did was run:</p>
+<div class="highlight"><pre><span></span><code> <span class="n">poetry</span> <span class="n">new</span> <span class="n">fablr</span>
+</code></pre></div>
+
+<p>This created several files and a folder for me, with the following structure:</p>
+<div class="highlight"><pre><span></span><code><span class="n">fablr</span>
+<span class="err">├──</span> <span class="n">pyproject</span><span class="o">.</span><span class="n">toml</span>
+<span class="err">├──</span> <span class="n">README</span><span class="o">.</span><span class="n">md</span>
+<span class="err">├──</span> <span class="n">fablr</span>
+<span class="err">│</span>   <span class="err">└──</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+<span class="err">└──</span> <span class="n">tests</span>
+    <span class="err">└──</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
+
+<p>You can verify this in your IDE:</p>
+<p><img alt="Untitled" src="images/poetry/Untitled%201.png"></p>
+<p>Notice that <code>poetry.lock</code> hasn’t been created yet. That’s because we haven’t added any dependencies to our project. Let’s go ahead and do that.</p>
+<h3>How can you manage dependencies?</h3>
+<h3>Adding a dependency</h3>
+<p>Since poetry performs several actions when you add, change, or remove dependencies, it’s better to create a virtual environment and activate that beforehand. As you can see, I have a virtual environment already created called <code>faker-dev-venv</code> (which is created automatically using the aforementioned postcreate.sh script). However, if you are not going that route, you can just go ahead and create a virtual enviornment yourself, <strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em></strong><em>activate it</em><strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em></strong>, and run the following command:</p>
+<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">venv</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">venv</span>
+</code></pre></div>
+
+<p>Adding dependencies with Poetry is incredibly easy, as it resolves all dependencies for you. My package <code>Fablr</code> is really just a python API wrapper for <code>faker</code> . So that was one of the first dependencies I added to my project. Adding it was as easy as running:</p>
+<div class="highlight"><pre><span></span><code><span class="n">poetry</span> <span class="n">add</span> <span class="n">faker</span><span class="o">==</span><span class="mf">19.13.0</span>
+</code></pre></div>
+
+<p><em>Note: I pinned Faker to 19.13.0, this is to avoid any issues with my wrapper and new versions of faker. If there are any issues while updating, I would want to be aware of them when updating, rather than re-building my enviornment with the latest version.</em> </p>
+<p>When you run this command a few things happen under the hood:</p>
+<ol>
+<li>The package is added to your project’s dependencies, and added to your <code>pyproject.toml</code> file. If you don’t specify a version a “latest compatible version specifier” “^version_number” is designated in <code>pyproject.toml</code> .</li>
+<li>Dependencies are resolved if there’s any and the added dependency and it’s sub-dependencies are recorded in the <code>poetry.lock</code> file. </li>
+<li>Finally, the package is installed in the environment along with it’s dependencies (<strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em></strong><em>so it’s </em><strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em>*important to have a virtual environment</strong><strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em> activated if you’re using one</strong>).</li>
+</ol>
+<h3>Removing a dependency</h3>
+<p>If you ever need to remove a dependency, it’s as easy as running:</p>
+<div class="highlight"><pre><span></span><code><span class="n">poetry</span> <span class="n">remove</span> <span class="n">faker</span>
+</code></pre></div>
+
+<p>Poetry will remove the dependency from your <code>poetry.lock</code> and <code>pyproject.toml</code> file, as well as uninstall it from your environment.</p>
+<h3>Dependency groups</h3>
+<p>In some cases, you might want to add a dependency that is only for development, or testing, and is not needed to <em>actually</em> run your package. In that case, you can leverage dependency groups in poetry. These allow you to separate different dependencies based on their context. </p>
+<div class="highlight"><pre><span></span><code><span class="n">poetry</span> <span class="n">add</span> <span class="n">ruff</span> <span class="o">--</span><span class="n">group</span> <span class="n">dev</span>
+</code></pre></div>
+
+<p>You can even declare these groups to be optional. In the example above, I added the <code>ruff</code> package to my dependencies, but in a group called dev. Making this group optional is as easy as denoting it in pyproject.toml.</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="n">tool</span><span class="o">.</span><span class="n">poetry</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">dev</span><span class="p">]</span>
+<span class="n">optional</span> <span class="o">=</span> <span class="n">true</span>
+
+<span class="p">[</span><span class="n">tool</span><span class="o">.</span><span class="n">poetry</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">dev</span><span class="o">.</span><span class="n">dependencies</span><span class="p">]</span>
+<span class="n">ruff</span> <span class="o">=</span> <span class="s2">&quot;^0.1.7&quot;</span>
+</code></pre></div>
+
+<p>This makes the <code>dev</code> group completely optional, and will not be installed by default. To install with groups, you can run </p>
+<div class="highlight"><pre><span></span><code><span class="n">poetry</span> <span class="n">install</span> <span class="o">--</span><span class="k">with</span> <span class="n">dev</span>
+</code></pre></div>
+
+<h3>Pinning dependencies</h3>
+<p>In some instances you may also want to pin your dependencies, this helps make sure the deployments are repeatable, and you could avoid any potential issues with API discrepancies caused by backwards incompatibility, etc.</p>
+<p>If we want to pin <code>black</code> to <code>23.11.0</code> , and add it to our dev group, all we have to do is run:</p>
+<div class="highlight"><pre><span></span><code><span class="n">poetry</span> <span class="n">add</span> <span class="n">black</span><span class="o">==</span><span class="mf">23.11.0</span> <span class="o">--</span><span class="n">group</span> <span class="n">dev</span> 
+</code></pre></div>
+
+<h3>Poetry.lock</h3>
+<p>Along with <code>pyproject.toml</code>, <code>poetry.lock</code> is  one of the most important files for setting up all of your dependencies. Contained within it are all of the dependencies and versions that are essential for your project. When you run <code>poetry add &lt;package_name&gt;</code>, it not only adds the dependency to your <code>pyproject.toml</code> file but it also adds it to <code>poetry.lock</code> as well as all of <strong><em>*</em></strong><strong><em>it’s</em></strong><strong><em>*</em></strong> dependencies. So when you run <code>poetry install</code> to set up your environment, it doesn’t just install your dependencies, and it’s versions needed for your project, it also resolves and adds direct dependencies and their required versions. </p>
+<p>Let’s take a look at a snippet of what was appended to <code>poetry.lock</code> when we added  the <code>black</code></p>
+<p>formatting package:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[[</span><span class="n">package</span><span class="p">]]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span>
+<span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;23.11.0&quot;</span>
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;The uncompromising code formatter.&quot;</span>
+<span class="n">optional</span> <span class="o">=</span> <span class="n">false</span>
+<span class="n">python</span><span class="o">-</span><span class="n">versions</span> <span class="o">=</span> <span class="s2">&quot;&gt;=3.8&quot;</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp310-cp310-macosx_10_9_x86_64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:dbea0bb8575c6b6303cc65017b46351dc5953eea5c0a59d7b7e3a2d2f433a911&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp310-cp310-macosx_11_0_arm64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:412f56bab20ac85927f3a959230331de5614aecda1ede14b373083f62ec24e6f&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:d136ef5b418c81660ad847efe0e55c58c8208b77a57a28a503a5f345ccf01394&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp310-cp310-win_amd64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:6c1cac07e64433f646a9a838cdc00c9768b3c362805afc3fce341af0e6a9ae9f&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp311-cp311-macosx_10_9_x86_64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:cf57719e581cfd48c4efe28543fea3d139c6b6f1238b3f0102a9c73992cbb479&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp311-cp311-macosx_11_0_arm64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:698c1e0d5c43354ec5d6f4d914d0d553a9ada56c85415700b81dc90125aac244&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:760415ccc20f9e8747084169110ef75d545f3b0932ee21368f63ac0fee86b221&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp311-cp311-win_amd64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:58e5f4d08a205b11800332920e285bd25e1a75c54953e05502052738fe16b3b5&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp38-cp38-macosx_10_9_x86_64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:45aa1d4675964946e53ab81aeec7a37613c1cb71647b5394779e6efb79d6d187&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp38-cp38-macosx_11_0_arm64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:4c44b7211a3a0570cc097e81135faa5f261264f4dfaa22bd5ee2875a4e773bd6&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:2a9acad1451632021ee0d146c8765782a0c3846e0e0ea46659d7c4f89d9b212b&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp38-cp38-win_amd64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:fc7f6a44d52747e65a02558e1d807c82df1d66ffa80a601862040a43ec2e3142&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp39-cp39-macosx_10_9_x86_64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:7f622b6822f02bfaf2a5cd31fdb7cd86fcf33dab6ced5185c35f5db98260b055&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp39-cp39-macosx_11_0_arm64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:250d7e60f323fcfc8ea6c800d5eba12f7967400eb6c2d21ae85ad31c204fb1f4&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:5133f5507007ba08d8b7b263c7aa0f931af5ba88a29beacc4b2dc23fcefe9c06&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-cp39-cp39-win_amd64.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:421f3e44aa67138ab1b9bfbc22ee3780b22fa5b291e4db8ab7eee95200726b07&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0-py3-none-any.whl&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:54caaa703227c6e0c87b76326d0862184729a69b73d3b7305b6288e1d830067e&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;black-23.11.0.tar.gz&quot;</span><span class="p">,</span> <span class="nb">hash</span> <span class="o">=</span> <span class="s2">&quot;sha256:4c68855825ff432d197229846f971bc4d6666ce90492e5b02013bcaca4d9ab05&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+
+<span class="p">[</span><span class="n">package</span><span class="o">.</span><span class="n">dependencies</span><span class="p">]</span>
+<span class="n">click</span> <span class="o">=</span> <span class="s2">&quot;&gt;=8.0.0&quot;</span>
+<span class="n">mypy</span><span class="o">-</span><span class="n">extensions</span> <span class="o">=</span> <span class="s2">&quot;&gt;=0.4.3&quot;</span>
+<span class="n">packaging</span> <span class="o">=</span> <span class="s2">&quot;&gt;=22.0&quot;</span>
+<span class="n">pathspec</span> <span class="o">=</span> <span class="s2">&quot;&gt;=0.9.0&quot;</span>
+<span class="n">platformdirs</span> <span class="o">=</span> <span class="s2">&quot;&gt;=2&quot;</span>
+<span class="n">tomli</span> <span class="o">=</span> <span class="p">{</span><span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;&gt;=1.1.0&quot;</span><span class="p">,</span> <span class="n">markers</span> <span class="o">=</span> <span class="s2">&quot;python_version &lt; </span><span class="se">\&quot;</span><span class="s2">3.11</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">}</span>
+<span class="n">typing</span><span class="o">-</span><span class="n">extensions</span> <span class="o">=</span> <span class="p">{</span><span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;&gt;=4.0.1&quot;</span><span class="p">,</span> <span class="n">markers</span> <span class="o">=</span> <span class="s2">&quot;python_version &lt; </span><span class="se">\&quot;</span><span class="s2">3.11</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">}</span>
+
+<span class="p">[</span><span class="n">package</span><span class="o">.</span><span class="n">extras</span><span class="p">]</span>
+<span class="n">colorama</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;colorama (&gt;=0.4.3)&quot;</span><span class="p">]</span>
+<span class="n">d</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;aiohttp (&gt;=3.7.4)&quot;</span><span class="p">]</span>
+<span class="n">jupyter</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ipython (&gt;=7.8.0)&quot;</span><span class="p">,</span> <span class="s2">&quot;tokenize-rt (&gt;=3.2.0)&quot;</span><span class="p">]</span>
+<span class="n">uvloop</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;uvloop (&gt;=0.15.2)&quot;</span><span class="p">]</span>
+</code></pre></div>
+
+<p>We can see that several elements were added to the file, such as the package name, the pinned version, and some extra metadata. Furthermore, some sub dependencies were added too, such as <code>click</code>, <code>pathspec</code>, etc.</p>
+<p>So, what’s important to note is that <code>pyproject.toml</code> is not the only file critical for your project. In other words, it’s not a glorified <code>requests.txt</code> file. What poetry does is use <code>pyproject.toml</code> in conjunction with the lock file to traverse and set up all the dependencies, their versions, and any sub dependencies, as well as resolving any dependency issues. </p>
+<h2>Managing your virtual environment</h2>
+<p>Using virtual environments in conjunction with poetry is pretty neat. You don’t need to install using any requirements.txt files. Let’s say you pull a repo that has been built using poetry, it contains <code>pyproject.toml</code>, <code>poetry.lock</code> , and you want to start developing straight away. You can create a virtual environment and activate it:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>path/to/venv
+<span class="nb">source</span><span class="w"> </span>path/to/venv/bin/activate<span class="w"> </span>
+</code></pre></div>
+
+<p>you should now see the virtual environment activated:</p>
+<div class="highlight"><pre><span></span><code><span class="o">(</span>faker-dev-venv<span class="o">)</span><span class="w"> </span>root@0cc23735c8a7:/workspaces/Fablr
+</code></pre></div>
+
+<p>All that’s left to do is run poetry install along with any group tags that may be necessary in your scenario.</p>
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>install<span class="w"> </span>
+</code></pre></div>
+
+<p>One cool feature of poetry is the ability to explicitly see dependency trees in your project. Using the following command, I was able to generate the dependency tree of my project. Here’s a quick snippet of it:</p>
+<div class="highlight"><pre><span></span><code><span class="o">(</span>faker-dev-venv<span class="o">)</span><span class="w"> </span>root@0cc23735c8a7:/workspaces/Fablr#<span class="w"> </span>poetry<span class="w"> </span>show<span class="w"> </span>--tree
+black<span class="w"> </span><span class="m">23</span>.11.0<span class="w"> </span>The<span class="w"> </span>uncompromising<span class="w"> </span>code<span class="w"> </span>formatter.
+├──<span class="w"> </span>click<span class="w"> </span>&gt;<span class="o">=</span><span class="m">8</span>.0.0
+│<span class="w">   </span>└──<span class="w"> </span>colorama<span class="w"> </span>*<span class="w"> </span>
+├──<span class="w"> </span>mypy-extensions<span class="w"> </span>&gt;<span class="o">=</span><span class="m">0</span>.4.3
+├──<span class="w"> </span>packaging<span class="w"> </span>&gt;<span class="o">=</span><span class="m">22</span>.0
+├──<span class="w"> </span>pathspec<span class="w"> </span>&gt;<span class="o">=</span><span class="m">0</span>.9.0
+├──<span class="w"> </span>platformdirs<span class="w"> </span>&gt;<span class="o">=</span><span class="m">2</span>
+├──<span class="w"> </span>tomli<span class="w"> </span>&gt;<span class="o">=</span><span class="m">1</span>.1.0
+└──<span class="w"> </span>typing-extensions<span class="w"> </span>&gt;<span class="o">=</span><span class="m">4</span>.0.1
+datetime<span class="w"> </span><span class="m">5</span>.3<span class="w"> </span>This<span class="w"> </span>package<span class="w"> </span>provides<span class="w"> </span>a<span class="w"> </span>DateTime<span class="w"> </span>data<span class="w"> </span>type,<span class="w"> </span>as<span class="w"> </span>known<span class="w"> </span>from<span class="w"> </span>Zope.<span class="w"> </span>Unless<span class="w"> </span>you<span class="w"> </span>need<span class="w"> </span>to<span class="w"> </span>communicate<span class="w"> </span>with<span class="w"> </span>Zope<span class="w"> </span>APIs,<span class="w"> </span>you<span class="s1">&#39;re probably better off using Python&#39;</span>s<span class="w"> </span>built-in<span class="w"> </span>datetime<span class="w"> </span>module.
+├──<span class="w"> </span>pytz<span class="w"> </span>*
+└──<span class="w"> </span>zope-interface<span class="w"> </span>*
+<span class="w">    </span>└──<span class="w"> </span>setuptools<span class="w"> </span>*<span class="w"> </span>
+faker<span class="w"> </span><span class="m">19</span>.13.0<span class="w"> </span>Faker<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>Python<span class="w"> </span>package<span class="w"> </span>that<span class="w"> </span>generates<span class="w"> </span>fake<span class="w"> </span>data<span class="w"> </span><span class="k">for</span><span class="w"> </span>you.
+├──<span class="w"> </span>python-dateutil<span class="w"> </span>&gt;<span class="o">=</span><span class="m">2</span>.4
+│<span class="w">   </span>└──<span class="w"> </span>six<span class="w"> </span>&gt;<span class="o">=</span><span class="m">1</span>.5<span class="w"> </span>
+└──<span class="w"> </span>typing-extensions<span class="w"> </span>&gt;<span class="o">=</span><span class="m">3</span>.10.0.1
+isort<span class="w"> </span><span class="m">5</span>.13.0<span class="w"> </span>A<span class="w"> </span>Python<span class="w"> </span>utility<span class="w"> </span>/<span class="w"> </span>library<span class="w"> </span>to<span class="w"> </span>sort<span class="w"> </span>Python<span class="w"> </span>imports.
+├──<span class="w"> </span>pip-api<span class="w"> </span>*
+│<span class="w">   </span>└──<span class="w"> </span>pip<span class="w"> </span>*<span class="w"> </span>
+├──<span class="w"> </span>pipreqs<span class="w"> </span>*
+│<span class="w">   </span>├──<span class="w"> </span>docopt<span class="w"> </span>*<span class="w"> </span>
+│<span class="w">   </span>└──<span class="w"> </span>yarg<span class="w"> </span>*<span class="w"> </span>
+│<span class="w">       </span>└──<span class="w"> </span>requests<span class="w"> </span>*<span class="w"> </span>
+│<span class="w">           </span>├──<span class="w"> </span>certifi<span class="w"> </span>&gt;<span class="o">=</span><span class="m">2017</span>.4.17<span class="w"> </span>
+│<span class="w">           </span>├──<span class="w"> </span>charset-normalizer<span class="w"> </span>&gt;<span class="o">=</span><span class="m">2</span>,&lt;<span class="m">4</span><span class="w"> </span>
+│<span class="w">           </span>├──<span class="w"> </span>idna<span class="w"> </span>&gt;<span class="o">=</span><span class="m">2</span>.5,&lt;<span class="m">4</span><span class="w"> </span>
+│<span class="w">           </span>└──<span class="w"> </span>urllib3<span class="w"> </span>&gt;<span class="o">=</span><span class="m">1</span>.21.1,&lt;<span class="m">3</span><span class="w"> </span>
+└──<span class="w"> </span>requirementslib<span class="w"> </span>*
+<span class="w">    </span>├──<span class="w"> </span>distlib<span class="w"> </span>&gt;<span class="o">=</span><span class="m">0</span>.2.8<span class="w"> </span>
+<span class="w">    </span>├──<span class="w"> </span>pep517<span class="w"> </span>&gt;<span class="o">=</span><span class="m">0</span>.5.0<span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>tomli<span class="w"> </span>&gt;<span class="o">=</span><span class="m">1</span>.1.0<span class="w"> </span>
+<span class="w">    </span>├──<span class="w"> </span>pip<span class="w"> </span>&gt;<span class="o">=</span><span class="m">23</span>.1<span class="w"> </span>
+<span class="w">    </span>├──<span class="w"> </span>platformdirs<span class="w"> </span>*<span class="w"> </span>
+<span class="w">    </span>├──<span class="w"> </span>plette<span class="w"> </span>*<span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>cerberus<span class="w"> </span>*<span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>tomlkit<span class="w"> </span>*<span class="w"> </span>
+<span class="w">    </span>├──<span class="w"> </span>pydantic<span class="w"> </span>*<span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>annotated-types<span class="w"> </span>&gt;<span class="o">=</span><span class="m">0</span>.4.0<span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>typing-extensions<span class="w"> </span>&gt;<span class="o">=</span><span class="m">4</span>.0.0<span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>pydantic-core<span class="w"> </span><span class="m">2</span>.14.5<span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>typing-extensions<span class="w"> </span>&gt;<span class="o">=</span><span class="m">4</span>.6.0,&lt;<span class="m">4</span>.7.0<span class="w"> </span><span class="o">||</span><span class="w"> </span>&gt;4.7.0<span class="w"> </span><span class="o">(</span>circular<span class="w"> </span>dependency<span class="w"> </span>aborted<span class="w"> </span>here<span class="o">)</span>
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>typing-extensions<span class="w"> </span>&gt;<span class="o">=</span><span class="m">4</span>.6.1<span class="w"> </span><span class="o">(</span>circular<span class="w"> </span>dependency<span class="w"> </span>aborted<span class="w"> </span>here<span class="o">)</span>
+<span class="w">    </span>├──<span class="w"> </span>requests<span class="w"> </span>*<span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>certifi<span class="w"> </span>&gt;<span class="o">=</span><span class="m">2017</span>.4.17<span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>charset-normalizer<span class="w"> </span>&gt;<span class="o">=</span><span class="m">2</span>,&lt;<span class="m">4</span><span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>idna<span class="w"> </span>&gt;<span class="o">=</span><span class="m">2</span>.5,&lt;<span class="m">4</span><span class="w"> </span>
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>urllib3<span class="w"> </span>&gt;<span class="o">=</span><span class="m">1</span>.21.1,&lt;<span class="m">3</span><span class="w"> </span>
+<span class="w">    </span>├──<span class="w"> </span>setuptools<span class="w"> </span>&gt;<span class="o">=</span><span class="m">40</span>.8<span class="w"> </span>
+<span class="w">    </span>└──<span class="w"> </span>tomlkit<span class="w"> </span>&gt;<span class="o">=</span><span class="m">0</span>.5.3<span class="w"> </span><span class="o">(</span>circular<span class="w"> </span>dependency<span class="w"> </span>aborted<span class="w"> </span>here<span class="o">)</span>
+</code></pre></div>
+
+<h2><strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em>*Building a wheel:</strong><strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em></strong><strong><em>*</em></strong>****</h2>
+<p>Building a wheel in poetry is extremely easy, all you have to do is run:</p>
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>build
+</code></pre></div>
+
+<p>and you should see a directory be created in the root directory of your project called <code>dist/</code>, in that directory should should see both a <code>name.tar.gz</code> file as well as <code>name.whl</code> file. You can can use these files for testing. </p>
+<h3>Versioning</h3>
+<p>You are able to version in poetry by updating the first few lines in pyproject.toml. When you do this and run <code>poetry build</code> a new <code>whl</code> and tar file are dumped in the dist directory, while still keeping older versions of your wheel or tar files. </p>
+<div class="highlight"><pre><span></span><code><span class="o">[</span>tool.poetry<span class="o">]</span>
+<span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;fablr&quot;</span>
+<span class="nv">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span>
+<span class="nv">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="nv">authors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;Jesus Caro &lt;jmcaro2@icloud.com&gt;&quot;</span><span class="o">]</span>
+<span class="nv">readme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;README.md&quot;</span>
+</code></pre></div>
+
+<h3>Publishing to PyPI:</h3>
+<p>When you’re finally ready to publish your package on PyPI, poetry can help streamline the process for you. First you have to register on PyPI and configure your credentials. PyPi requires you register on their website and retrieve an API token.</p>
+<p>You can register it using the CLI by running:</p>
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>config<span class="w"> </span>pypi-token.pypi<span class="w"> </span>&lt;APItoken&gt;
+</code></pre></div>
+
+<p>Once registered, all you have to do is run:</p>
+<div class="highlight"><pre><span></span><code>poetry<span class="w"> </span>publish
+</code></pre></div>
+
+<p>It’s that easy. </p>
+<h3>Conclusion</h3>
+<p>To sum it up, this article served as a comprehensive guide to using Poetry for Python projects. It covered the essential steps from creating your project and dependency management to version control and packaging for distribution via PyPI. Poetry acted as a useful tool,  making the entire process easier as well as allowing you to ensure the project is well-organized and ready for sharing. Armed with these insights, you can confidently utilize Poetry to efficiently manage your Python projects, making the process smoother and more organized.</p>
+
+
+</div>
+		</div>
+	</body>
+</html>
