@@ -1,5 +1,5 @@
 # Use an official Python image with the desired version
-FROM python:3.8
+FROM jupyter/pyspark-notebook:notebook-7.0.2
 
-# Set the working directory inside the container
+
 WORKDIR /workspaces/jcaroblog
