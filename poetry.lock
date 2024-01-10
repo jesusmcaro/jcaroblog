@@ -330,8 +330,8 @@ usaddress = "^0.5.10"
 [package.source]
 type = "git"
 url = "https://github.com/jesusmcaro/Fablr.git"
-reference = "poetry-article"
-resolved_reference = "56775a46594b2ce99c16d6f1b3f8e1dc034caa01"
+reference = "0.1.0"
+resolved_reference = "31ed9c5cb3905452cf2fdf6fc81c53c8b9c71e5d"
 
 [[package]]
 name = "faker"
@@ -2024,4 +2024,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "953dd7e1d7b5a42f1189d4be50a5cc44c88fc6ad2b89f56be20f1c1007a982ed"
+content-hash = "f6799a2e69e9fa4fa0d20591eafa296c604bf75272b7fe467ea61796b6e76573"
