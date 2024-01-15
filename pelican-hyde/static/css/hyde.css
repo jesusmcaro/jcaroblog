@@ -162,9 +162,9 @@ a.sidebar-social-item.active:focus {
   padding-bottom: 4rem;
 }
 
-@media (min-width: 48em) {
+@media (min-width: 58em) {
   .content {
-    max-width: 38rem;
+    max-width: 58rem;
     margin-left: 20rem;
     margin-right: 2rem;
   }
@@ -184,21 +184,21 @@ a.sidebar-social-item.active:focus {
  * Flip the orientation of the page by placing the `.sidebar` on the right.
  */
 
-@media (min-width: 48em) {
+@media (min-width: 68em) {
   .layout-reverse .sidebar {
     left: auto;
     right: 0;
   }
   .layout-reverse .content {
     margin-left: 2rem;
-    margin-right: 20rem;
+    margin-right: 10rem;
   }
 }
 
-@media (min-width: 64em) {
+@media (min-width: 74em) {
   .layout-reverse .content {
     margin-left: 4rem;
-    margin-right: 22rem;
+    margin-right: 12rem;
   }
 }
 

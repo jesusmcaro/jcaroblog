@@ -8,9 +8,9 @@
 		<!-- Metadata -->
 	<meta name="description" content="Hello! My name is Jesus Caro, I am a Data Engineer with 6 years of experience in Data Engineering, analytics and data science. This blog is a collection of things I find interesting, as well as some personal stuff!">
 	<meta property="og:description" content="Hello! My name is Jesus Caro, I am a Data Engineer with 6 years of experience in Data Engineering, analytics and data science. This blog is a collection of things I find interesting, as well as some personal stuff!">
-	<meta property="og:title" content="testing testing" />
+	<meta property="og:title" content="The Virtues of a Programming your ETL Pipeline using a Fluent API" />
 	<meta property="og:type" content="article" />
-	<meta property="og:url" content="/testing-testing.html" />
+	<meta property="og:url" content="/the-virtues-of-a-programming-your-etl-pipeline-using-a-fluent-api.html" />
 		<meta property="og:image" content="/images/me.png" />
 
 		<!-- Enable responsiveness on mobile devices-->
@@ -63,8 +63,8 @@
 	</div>
 </div>		<div class="content container">
 <div class="post">
-	<h1 class="post-title">testing testing</h1>
-	<span class="post-date">Sun 19 November 2023</span>
+	<h1 class="post-title">The Virtues of a Programming your ETL Pipeline using a Fluent API</h1>
+	<span class="post-date">Wed 10 January 2024</span>
 	<style type="text/css">/*!
 *
 * IPython notebook
@@ -1182,12 +1182,73 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
  .highlight pre  .vg { color: #19177C } /* Name.Variable.Global */
  .highlight pre  .vi { color: #19177C } /* Name.Variable.Instance */
  .highlight pre  .vm { color: #19177C } /* Name.Variable.Magic */
- .highlight pre  .il { color: #666666 } /* Literal.Number.Integer.Long */</style><body><div class="cell border-box-sizing code_cell rendered">
+ .highlight pre  .il { color: #666666 } /* Literal.Number.Integer.Long */</style><body><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Introduction:-The-Fluent-Interface-Pattern">Introduction: The Fluent Interface Pattern<a class="anchor-link" href="#Introduction:-The-Fluent-Interface-Pattern">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This week marked a new chapter in my career. I started a new job as a Data Engineer for Synaptiq building ETL pipelines that feed into ML and AI models. Looking back at my (nearly) year long career at Sequoia (A First American Startup),
+I cant help but feel grateful for the opportunity to have worked with such a talented team. I learned a lot about Data Engineering. One of the most undervalues things I learned in that role 
+came in the form of a design preference from my Team lead. Often he would ask me to write additional transforms and apply them in pipelines using the <strong>Fluent API</strong>. I googled it, and there is some literature on the topic, but it's 
+a bit technical, and not really to the point. So I decided to write this post to explain what it is, and some benefits with leveraging this design by using a simple illustration in the form of a sample Pyspark pipeline.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="What-is-a-Fluent-Interface?">What is a <code>Fluent Interface?</code><a class="anchor-link" href="#What-is-a-Fluent-Interface?">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A fluent interface is a design pattern that allows you to chain methods (and in our case transformations) together in a way that is easy to read and understand. Leveraging this design pattern can make your code more readable, and easier to maintain. Those are not the only benefits, using a fluent interface, along with "unit transformations" can make your code more testable.</p>
+<p>Let's look at an example. In the following example, I have created a simple data model for a ticket reseller. The data model is simple, and contains three tables:</p>
+<ul>
+<li>Users: The users table contains information about the users of the platform.</li>
+<li>Tickets: The tickets table contains information about the tickets that were purchased by each user.</li>
+<li>Events: The events table contains information about the events that the tickets are for.</li>
+</ul>
+<p>An ERD for the data model is shown below:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="images/fluent_api/hot_tickets_erd.png" alt="ERD"></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In this example, we'll be using building our ETL pipeline in pyspark. Pyspark has a neat method called <code>.transform()</code> that allows you to apply a transform to a dataframe. This method returns a new dataframe, and allows you to chain transformations together. First, let's print out our dataframes to see what we're working with.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">users_df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Users dataframe&quot;</span><span class="p">)</span>
+<span class="n">users_df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tickets dataframe&quot;</span><span class="p">)</span>
+<span class="n">tickets_df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Events dataframe&quot;</span><span class="p">)</span>
+<span class="n">events_df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -1204,13 +1265,34 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>+-------+----------+---------+--------------------+----------+-----------------+
+<pre>Users dataframe
++-------+----------+---------+--------------------+----------+-----------------+
 |user_id|first_name|last_name|email               |last_login|subscription_tier|
 +-------+----------+---------+--------------------+----------+-----------------+
 |13726  |Joseph    |Mack     |daniel06@example.net|2023-08-07|Standard         |
 |89338  |Melissa   |Moore    |ann32@example.org   |2023-06-19|Prime            |
 |156657 |Nicholas  |Smith    |cgarcia@example.org |2023-09-17|Prime            |
 +-------+----------+---------+--------------------+----------+-----------------+
+only showing top 3 rows
+
+Tickets dataframe
++----------+--------------+-------+-------------+---------+
+|ticket_no |event_id      |user_id|total_charged|surcharge|
++----------+--------------+-------+-------------+---------+
+|9957101488|eid_MPlU-54882|118225 |513.25       |11.99    |
+|967991971 |eid_JvhR-30831|141011 |250.34       |0.0      |
+|5662180548|eid_TqKz-24766|168873 |46.43        |0.0      |
++----------+--------------+-------+-------------+---------+
+only showing top 3 rows
+
+Events dataframe
++--------------+------------------+----------+--------------+------------+
+|event_id      |event_name        |event_date|event_location|event_result|
++--------------+------------------+----------+--------------+------------+
+|eid_BRqB-98032|Coldplay          |2022-12-24|Morganhaven   |succesfull  |
+|eid_IoFo-28520|James Taylor      |2020-11-16|Port Vanessa  |succesfull  |
+|eid_KTrZ-91270|The Rolling Stones|2023-04-11|Lake Yolanda  |succesfull  |
++--------------+------------------+----------+--------------+------------+
 only showing top 3 rows
 
 </pre>
@@ -1224,26 +1306,159 @@ only showing top 3 rows
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Testing does it show this cell?</p>
+<p>Our task is to build an ETL pipeline that will return the number of tickets sold for events between two dates, as well as the total revenue generated for those events, by subscription tier.</p>
+<p>Let's start by listing the transformations, so that we can build our ETL pipeline in a fluent way.</p>
+<ul>
+<li>1.) Filter events between two dates, that were marked <code>successful</code> and not cancelled (these were refunded)</li>
+<li>2.) Join events and tickets on event_id to grab the total charge and surcharge.</li>
+<li>3.) Join events and users on user_id to grab the subscription tiers.</li>
+<li>4.) Group by events, and subscription tier and sum to get the total revenue and surcharge for subscription tier <code>standard</code>.</li>
+</ul>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>How about this cell?</p>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[108]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">DateType</span>
+<span class="kn">import</span> <span class="nn">pyspark.sql.functions</span> <span class="k">as</span> <span class="nn">F</span>
+
+<span class="k">def</span> <span class="nf">filter_events</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_df</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;event_date&#39;</span><span class="p">)</span>
+                          <span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">))</span>
+                  <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;event_result&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;succesfull&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_df</span>
+
+<span class="k">def</span> <span class="nf">agg_revenue</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">groupBy</span><span class="p">([</span><span class="s1">&#39;event_id&#39;</span><span class="p">,</span><span class="s1">&#39;event_name&#39;</span><span class="p">,</span> <span class="s1">&#39;subscription_tier&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s1">&#39;total_charged&#39;</span><span class="p">:</span> <span class="s1">&#39;sum&#39;</span><span class="p">,</span> <span class="s1">&#39;surcharge&#39;</span><span class="p">:</span> <span class="s1">&#39;sum&#39;</span><span class="p">})</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[111]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">events_df</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">filter_events</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="s1">&#39;2021-01-01&#39;</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="s1">&#39;2021-12-31&#39;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[111]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>DataFrame[event_id: string, event_name: string, event_date: date, event_location: string, event_result: string]</pre>
+</div>
+
+</div>
 
 </div>
 </div>
+
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>And this cell?</p>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_revenue</span><span class="p">(</span>
+    <span class="n">events</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">tickets</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">users</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">start_date</span><span class="p">:</span> <span class="n">DateType</span><span class="p">,</span>
+    <span class="n">end_date</span><span class="p">:</span> <span class="n">DateType</span><span class="p">,</span>
+    <span class="n">event_result</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">subscription_tier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    
+    <span class="n">events</span><span class="o">.</span><span class="n">transform</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[58]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">_df</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">&quot;hello&quot;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[59]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">_df</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[59]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;function __main__._df()&gt;</pre>
+</div>
+
+</div>
 
 </div>
 </div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+
+    </div>
+</div>
+</div>
+
 </div>
  
 
