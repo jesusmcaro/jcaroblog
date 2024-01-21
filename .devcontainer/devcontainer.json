@@ -1,0 +1,15 @@
+{
+    "name": "JCaro Blog", 
+    "dockerFile": "Dockerfile",
+    "postCreateCommand": "bash .devcontainer/postcreate.sh",
+    "settings": {
+      "python.terminal.activateEnvInCurrentTerminal": true,
+      "python.defaultInterpreterPath": "~/workspaces/jcaroblog/jcaroblog-dev-venv/bin/python"
+    },
+    "extensions": [
+      "ms-python.python",
+      "mikoz.black-py",
+      "charliermarsh.ruff",
+      "njpwerner.autodocstring"
+    ]
+  }

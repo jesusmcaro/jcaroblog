@@ -1,0 +1,4 @@
+[input]
+html_selector = "main"
+base_directory = "output"
+files = []

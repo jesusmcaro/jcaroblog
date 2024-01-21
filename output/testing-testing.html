@@ -8,9 +8,9 @@
 		<!-- Metadata -->
 	<meta name="description" content="Hello! My name is Jesus Caro, I am a Data Engineer with 6 years of experience in Data Engineering, analytics and data science. This blog is a collection of things I find interesting, as well as some personal stuff!">
 	<meta property="og:description" content="Hello! My name is Jesus Caro, I am a Data Engineer with 6 years of experience in Data Engineering, analytics and data science. This blog is a collection of things I find interesting, as well as some personal stuff!">
-	<meta property="og:title" content="Development Containers in VSCode and Github Codespaces!" />
+	<meta property="og:title" content="testing testing" />
 	<meta property="og:type" content="article" />
-	<meta property="og:url" content="/development-containers-in-vscode-and-github-codespaces.html" />
+	<meta property="og:url" content="/testing-testing.html" />
 		<meta property="og:image" content="/images/me.png" />
 
 		<!-- Enable responsiveness on mobile devices-->
@@ -63,7 +63,7 @@
 	</div>
 </div>		<div class="content container">
 <div class="post">
-	<h1 class="post-title">Development Containers in VSCode and Github Codespaces!</h1>
+	<h1 class="post-title">testing testing</h1>
 	<span class="post-date">Sun 19 November 2023</span>
 	<style type="text/css">/*!
 *
@@ -1182,147 +1182,49 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
  .highlight pre  .vg { color: #19177C } /* Name.Variable.Global */
  .highlight pre  .vi { color: #19177C } /* Name.Variable.Instance */
  .highlight pre  .vm { color: #19177C } /* Name.Variable.Magic */
- .highlight pre  .il { color: #666666 } /* Literal.Number.Integer.Long */</style><body><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Development-Containers">Development Containers<a class="anchor-link" href="#Development-Containers">&#182;</a></h1><h1 id="Intro">Intro<a class="anchor-link" href="#Intro">&#182;</a></h1><p>If you're involved in a collaborative project, you're likely familiar with dev containers. They serve as a crucial tool for ensuring consistency in development environments across team members. This means you're guaranteed to be working with the same Python version, have the necessary drivers, and more.</p>
-<p>In my current role, we leverage dev containers in conjunction with Poetry not only to enforce a standardized development environment but also to establish a uniform Python virtual environment.</p>
-<p>This article will demonstrate a straightforward method for creating a dev container for a Python project. In this guide, we will be creating a development container for a package called <strong>Fablr</strong>. In this example we will:</p>
-<ul>
-<li>Define a dev container using <strong>devcontainer.json</strong>.</li>
-<li>Specify a Docker image to complement our dev container.</li>
-<li>Set up a post dev-container creation script.</li>
-<li>Illustrate how to connect a VS Code instance to our dev container, including defining VS Code extensions within it.</li>
-<li>Show how integrating Poetry ensures all developers work with a consistent toolkit.</li>
-<li>Highlight how dev containers can enhance development in GitHub CodeSpaces.</li>
-</ul>
-<h2 id="Sections">Sections<a class="anchor-link" href="#Sections">&#182;</a></h2><p><strong>Note</strong>: A prerequisite for this article is having Docker Desktop and VS Code Installed. You can find a link to docker desktop <a href="https://www.docker.com/products/docker-desktop/">here</a>. You can find another for VS Code <a href="https://code.visualstudio.com/">here</a>.</p>
-<h3 id="What-are-Dev-Containers?">What are Dev Containers?<a class="anchor-link" href="#What-are-Dev-Containers?">&#182;</a></h3><h3 id="What-is-Docker?">What is Docker?<a class="anchor-link" href="#What-is-Docker?">&#182;</a></h3><p>To understand dev containers, first we should become a little familiar with Docker. Docker has been around since 2013 and allows you to create containerized applications, including containerized virtual machines. You can read more about virtual machines <a href="https://azure.microsoft.com/en-us/resources/cloud-computing-dictionary/what-is-a-virtual-machine">here</a>. Using Docker containers, you can effectively create a uniform virtual machine using an image. This virtual machine can be loaded with any OS of your choosing, with any applications, drivers, and dependencies installed.</p>
-<h3 id="Dev-Container-Project-Structure">Dev Container Project Structure<a class="anchor-link" href="#Dev-Container-Project-Structure">&#182;</a></h3><p>It’s worth noting that the following files have to be created in a <code>.devcontainer</code> folder in the root directory of your project like so:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-
-<pre><code>/Fablr
-    /.devcontainer
-        devcontainer.json
-            Dockerfile
-                postcreate.sh
-    /Fablr
-        __init__.py
-    /tests
-        test_fablr.py
-        readme.md
-        poetry.lock
-        pyproject.toml</code></pre>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Defining-a-devcontainer.json-file">Defining a <code>devcontainer.json</code> file<a class="anchor-link" href="#Defining-a-devcontainer.json-file">&#182;</a></h3><p>The <code>devcontainer.json</code> file ties together everything you need and is, in short, a configuration file for your dev container. In the following sections, we’ll be defining a <code>Dockerfile</code>, as well as a <code>postcreation.sh</code> file. This file ties everything together to ensure that these files and their encapsulated instruction sets are run successfully.</p>
-<p>Here is an example of a <code>devcontainer.json</code> file defined for our toy package <code>Fablr</code>:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-
-<pre><code>{
-  "name": "Fablr Dev", 
-  "dockerFile": "Dockerfile",
-  "postCreateCommand": "bash .devcontainer/postcreate.sh",
-  "settings": {
-    "python.terminal.activateEnvInCurrentTerminal": true,
-    "python.defaultInterpreterPath": "~/workspaces/Fablr/faker-dev-venv/bin/python"
-  },
-  "extensions": [
-    "ms-python.python",
-    "mikoz.black-py",
-    "charliermarsh.ruff",
-    "njpwerner.autodocstring"
-  ]
-}</code></pre>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>The key-value pairs defined above are:</p>
-<ul>
-<li><strong>name</strong>: The name of our dev container.</li>
-<li><strong>dockerfile</strong>: The <code>Dockerfile</code> defining our container that will be created in Docker.</li>
-<li><strong>postCreateCommand</strong>: The bash script that needs to be run after creating the Docker container.</li>
-<li><strong>settings</strong>: Any miscellaneous settings that need to be defined. Here we will be creating a virtual environment with Poetry, and our setting key-value pairs <code>python.terminal.activateEnvInCurrentTerminal</code> and <code>python.defaultInterpreterPath</code> indicate whether the virtual environments should be activated, as well as where the interpreter path of our virtual environment is.</li>
-<li><strong>extensions</strong>: This installs any VSCode extensions you want to be available on creation of the development environment.</li>
-</ul>
-<h3 id="Defining-a-Dockerfile-for-our-Development-Container">Defining a Dockerfile for our Development Container<a class="anchor-link" href="#Defining-a-Dockerfile-for-our-Development-Container">&#182;</a></h3><p>In Docker, this is done using a DockerFile, you can read more about docker files <a href="https://docs.docker.com/engine/reference/builder/#:~:text=A%20Dockerfile%20is%20a%20text,can%20use%20in%20a%20Dockerfile%20.">here</a>. A docker file is effectively a set of instructions telling docker how to set up and configure a docker container. Here’s a simplified example of one we’ll be using:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-
-<pre><code># Use an official Python image with the desired version
-FROM python:3.8
-
-# Set the working directory inside the container
-WORKDIR /workspaces/Fablr</code></pre>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Every DockerFile starts with the line <code>From ____</code>. In the above example <code>FROM python:3.8</code> tells docker that the base image to build the container on is the one hosted on DockerHub <a href="https://hub.docker.com/_/python">here</a>. It tells docker to pull that image and set it as a base image. The following line <code>WORKDIR /workspaces/Fablr</code> sets the working directory to <code>/workspaces/Fablr</code> .</p>
-<p>It’s worth noting you can add commands to run, such as the installation of drivers, copying files etc. These commands would be identical to the terminal commands. All you have to do is prepend the commands with RUN like so:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<div class="highlight"><pre><span></span><span class="c"># Use an official Python image with the desired version</span>
-<span class="k">FROM</span><span class="w"> </span><span class="s">python:3.8</span>
-
-<span class="c"># Set the working directory inside the container</span>
-<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/workspaces/Fablr</span>
-
-<span class="c"># Install Postgres Driver</span>
-<span class="c"># Update package lists</span>
-<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update
-
-<span class="c"># Install curl and other necessary packages</span>
-<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>curl<span class="w"> </span>apt-transport-https<span class="w"> </span>ca-certificates<span class="w"> </span>gnupg2
-
-<span class="c"># Install PostgreSQL client</span>
-<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>libpq-dev
+ .highlight pre  .il { color: #666666 } /* Literal.Number.Integer.Long */</style><body><div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">users_df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
+    </div>
 </div>
 </div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+-------+----------+---------+--------------------+----------+-----------------+
+|user_id|first_name|last_name|email               |last_login|subscription_tier|
++-------+----------+---------+--------------------+----------+-----------------+
+|13726  |Joseph    |Mack     |daniel06@example.net|2023-08-07|Standard         |
+|89338  |Melissa   |Moore    |ann32@example.org   |2023-06-19|Prime            |
+|156657 |Nicholas  |Smith    |cgarcia@example.org |2023-09-17|Prime            |
++-------+----------+---------+--------------------+----------+-----------------+
+only showing top 3 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This is one method for making sure you have a postgres driver automatically installed in your dev container. After installing <code>libpq-dev</code> , you can pip install <code>psycopg2</code> , or add it to your <code>poetry.lock</code> file (more on this later) to make sure it’s available in your virtual environment.</p>
-<p>However I would implement this in the <code>postcreation.sh</code> bash script in the following section.</p>
-<h3 id="Set-up-a-post-container-creation-script:">Set up a post container-creation script:<a class="anchor-link" href="#Set-up-a-post-container-creation-script:">&#182;</a></h3><p>As we saw before <code>devcontainer.json</code> allows you to define a post container-creation script that runs automatically after creating the container. You can do a lot with this bash script, such as install drivers, copy and download files, etc.</p>
-<p>In our example <code>[postcreate.sh](http://postcreate.sh)</code> script, we will pip install poetry, and using the sample poetry configuration files, we will create a virtual environment, and then activate that environment in our VSCode workspace.  The <code>postcreate.sh</code> script is below:</p>
+<p>Testing does it show this cell?</p>
 
 </div>
 </div>
@@ -1330,17 +1232,7 @@ WORKDIR /workspaces/Fablr</code></pre>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;##################&quot;</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;running postcreate.sh&quot;</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;##################&quot;</span>
-
-<span class="c1"># Set up a virtual environment from the poetry.lock file</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="nv">poetry</span><span class="o">==</span><span class="m">1</span>.7.0
-python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>faker-dev-venv
-<span class="nb">source</span><span class="w"> </span>faker-dev-venv/bin/activate
-poetry<span class="w"> </span>install
-</pre></div>
+<p>How about this cell?</p>
 
 </div>
 </div>
@@ -1348,102 +1240,7 @@ poetry<span class="w"> </span>install
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>First, we print out “running postcreate.sh”, this is useful for real-time debugging as VSCode allows you to monitor the dev-container creation in VSCode’s terminal. The following lines install poetry, this is pinned at <code>poetry==1.7.0</code>, after that we create a virtual environment using base python’s <code>venv</code> . We activate that environment, and then install all dependencies in our poetry configuration files.</p>
-<p>This virtual environment will be located in the directory <code>/workspaces/Fablr/faker-dev-venv/bin/python</code> . This is where the settings configuration in <code>devcontainer.json</code> comes in handy:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<div class="highlight"><pre><span></span><span class="s2">&quot;settings&quot;</span>:<span class="w"> </span><span class="o">{</span>
-<span class="w">    </span><span class="s2">&quot;python.terminal.activateEnvInCurrentTerminal&quot;</span>:<span class="w"> </span>true,
-<span class="w">    </span><span class="s2">&quot;python.defaultInterpreterPath&quot;</span>:<span class="w"> </span><span class="s2">&quot;~/workspaces/Fablr/faker-dev-venv/bin/python&quot;</span>
-<span class="w">  </span><span class="o">}</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>This automatically sets the virtual environment path as the default interpreter and activates it.</p>
-<h3 id="The-Final-Product:">The Final Product:<a class="anchor-link" href="#The-Final-Product:">&#182;</a></h3><p>After making sure you have your three configuration files the <code>devcontainer</code> directory in the root of your repo, you should be able to open up your repo in VSCODE:</p>
-<p><img src="images/dev_containers/Untitled.png" alt="Untitled"></p>
-<p>Now you can hit CMD+Shift+P, to open up your pallet and run <code>Dev Containers: Rebuild Container without cache.</code></p>
-<p><img src="images/dev_containers/Untitled%201.png" alt="Untitled"></p>
-<p>If configured correctly you should see it start to build automatically!</p>
-<p><img src="images/dev_containers/Untitled%202.png" alt="Untitled"></p>
-<p>It’s definitely worth mentioning that I have configured this dev container to leverage <strong><strong><em>**</em></strong></strong>poetry<strong><strong><em>**</em></strong></strong> to manage my virtual environment, so if you copy and paste my files they won’t necessarily work, unless you have created a repo already using poetry. You can learn more about that <a href="https://python-poetry.org/">here</a></p>
-<p>My poetry project has a few dependencies such as <code>Faker</code>, <code>usa-address</code>, and <code>pendulum</code> . Let’s see if our virtual environment was created successfully. After the container is created, we can open up a quick python terminal and try and import Faker and create a fake address:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<div class="highlight"><pre><span></span><span class="o">(</span>faker-dev-venv<span class="o">)</span><span class="w"> </span>root@0cc23735c8a7:/workspaces/Fablr#<span class="w"> </span>python
-Python<span class="w"> </span><span class="m">3</span>.8.18<span class="w"> </span><span class="o">(</span>default,<span class="w"> </span>Nov<span class="w">  </span><span class="m">1</span><span class="w"> </span><span class="m">2023</span>,<span class="w"> </span><span class="m">11</span>:08:38<span class="o">)</span><span class="w"> </span>
-<span class="o">[</span>GCC<span class="w"> </span><span class="m">12</span>.2.0<span class="o">]</span><span class="w"> </span>on<span class="w"> </span>linux
-Type<span class="w"> </span><span class="s2">&quot;help&quot;</span>,<span class="w"> </span><span class="s2">&quot;copyright&quot;</span>,<span class="w"> </span><span class="s2">&quot;credits&quot;</span><span class="w"> </span>or<span class="w"> </span><span class="s2">&quot;license&quot;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>more<span class="w"> </span>information.
-&gt;&gt;&gt;<span class="w"> </span>import<span class="w"> </span>faker
-&gt;&gt;&gt;<span class="w"> </span><span class="nv">generator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>faker.Faker<span class="o">()</span>
-&gt;&gt;&gt;<span class="w"> </span>generator.address<span class="o">()</span>
-<span class="s1">&#39;05065 Mcmillan Court Suite 013\nPort Jesse, UT 61666&#39;</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>It seems like our environment was set up succesfully, but if we want to be 100% sure we can always check <code>pip freeze</code>:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<div class="highlight"><pre><span></span><span class="nv">Faker</span><span class="o">==</span><span class="m">19</span>.13.0
-<span class="nv">future</span><span class="o">==</span><span class="m">0</span>.18.3
-<span class="nv">pendulum</span><span class="o">==</span><span class="m">2</span>.1.2
-<span class="nv">probableparsing</span><span class="o">==</span><span class="m">0</span>.0.1
-python-crfsuite<span class="o">==</span><span class="m">0</span>.9.9
-python-dateutil<span class="o">==</span><span class="m">2</span>.8.2
-<span class="nv">pytzdata</span><span class="o">==</span><span class="m">2020</span>.1
-<span class="nv">six</span><span class="o">==</span><span class="m">1</span>.16.0
-<span class="nv">typing_extensions</span><span class="o">==</span><span class="m">4</span>.8.0
-<span class="nv">usaddress</span><span class="o">==</span><span class="m">0</span>.5.10
-</pre></div>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Github-Codespaces:">Github Codespaces:<a class="anchor-link" href="#Github-Codespaces:">&#182;</a></h3><p>One neat thing about defining a dev container in your repository, is that it integrates pretty seamlessly with Github Codespaces. In order to create a development environment using your container you can navigate to your repository. Click on the upper right green <strong>Code</strong> icon. You will see a dialog box allowing you to create a codespace on whatever branch you’re on. <em>protip</em> if you’re developing on a feature branch, make sure you create the codespace <strong>on</strong> the feature branch.</p>
-<p><img src="images/dev_containers/Untitled%203.png" alt="Untitled"></p>
-<p>On the lower righthand side you can view the progress of the codespace configuration:</p>
-<p><img src="images/dev_containers/Untitled%204.png" alt="Untitled"></p>
-<p>Once it’s done loading you’ll see the virtual environment activated and you’re off to the races!</p>
-<h1 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h1><p>Dev containers are fantastic for working in collaborative projects, they offer consistency and standardization across development environments, ensuring a unified toolkit among team members. By seamlessly integrating dev containers with Poetry, you are not only able to leverage a standardized development environment but also establish a consistent Python virtual environment.</p>
-<p>Throughout this comprehensive guide, we outlined the process of creating a dev container for the Python project <strong>Fablr</strong>. From defining the <code>devcontainer.json</code> to specifying Docker images, setting up post-dev-container scripts, and integrating with VS Code extensions, each step ensures a streamlined and reproducible setup.</p>
-<p>Furthermore, the guide emphasizes the flexibility of post-container-creation scripts, showing how a <code>postcreate.sh</code> can help automate the configuration of a virtual environment using Poetry and activate it within the VS Code workspace.</p>
-<p>The final product showcases a seamless integration of dev containers within VS Code, facilitating a straightforward setup process, and underscores the importance of leveraging Poetry for managing virtual environments.</p>
-<p>You can find a link to the repository here: <a href="https://github.com/jesusmcaro/Fablr">https://github.com/jesusmcaro/Fablr</a>. Please note that further articles will build upon this repository. So you may see a difference in some of the aforementioned files and what is currently used in the repo.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
+<p>And this cell?</p>
 
 </div>
 </div>

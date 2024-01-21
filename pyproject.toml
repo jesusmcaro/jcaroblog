@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "jcaroblog"
+version = "0.1.0"
+description = ""
+authors = ["Jesus Caro <jmcaro2@icloud.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pelican-jupyter = "^0.10.1"
+ipython-genutils = "^0.2.0"
+jinja2 = "3.0.0"
+pelican = "4.8.0"
+pyspark = "^3.5.0"
+pandas = "1.5.0"
+datetime = "^5.4"
+fablr = {git = "https://github.com/jesusmcaro/Fablr.git", rev = "0.1.0"}
+pyspark-test = "^0.2.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.28.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

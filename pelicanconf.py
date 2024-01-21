@@ -11,7 +11,7 @@ TIMEZONE = 'MST'
 
 DEFAULT_LANG = 'en'
 
-THEME = '/Users/jcaro-work/VSCODE/theme_repo/pelican-hyde'
+THEME = '/workspaces/jcaroblog/pelican-hyde'
 
 # Feed generation is usually not desired when developing
 FEED_ALL_ATOM = None
