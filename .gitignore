@@ -1,0 +1,3 @@
+#ignore lib and bin folders
+jcaroblog-dev-venv/lib
+jcaroblog-dev-venv/bin
