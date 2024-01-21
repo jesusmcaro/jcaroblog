@@ -1325,6 +1325,20 @@ pandas-on-spark = ["numpy (>=1.15)", "pandas (>=1.0.5)", "pyarrow (>=4.0.0)"]
 sql = ["numpy (>=1.15)", "pandas (>=1.0.5)", "pyarrow (>=4.0.0)"]
 
 [[package]]
+name = "pyspark-test"
+version = "0.2.0"
+description = "Check that left and right spark DataFrame are equal."
+optional = false
+python-versions = "*"
+files = [
+    {file = "pyspark_test-0.2.0-py3-none-any.whl", hash = "sha256:dd4fb03c4f438f718a870a9268a459f2f8924829c767302f5515202707c97709"},
+    {file = "pyspark_test-0.2.0.tar.gz", hash = "sha256:0d9d8d3a352a9b1c30761b0553a5771cb9dbb9a278955b3e7b0aed0ae13892d8"},
+]
+
+[package.dependencies]
+pyspark = ">=2.1.2"
+
+[[package]]
 name = "pytest"
 version = "7.4.4"
 description = "pytest: simple powerful testing with Python"
@@ -2024,4 +2038,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "03073c4a05cd757df5528bbf9be467d165274e5a163b1d5d7df0dd55ee682c57"
+content-hash = "16f8eabb0052f8a9fa4e3eb983424aaf3473a33416ab55b2d770db5a3f688007"

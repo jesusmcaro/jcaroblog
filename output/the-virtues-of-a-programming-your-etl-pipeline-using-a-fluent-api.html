@@ -1210,7 +1210,7 @@ a bit technical, and not really to the point. So I decided to write this post to
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>A fluent interface is a design pattern that allows you to chain methods (and in our case transformations) together in a way that is easy to read and understand. Leveraging this design pattern can make your code more readable, and easier to maintain. Those are not the only benefits, using a fluent interface, along with "unit transformations" can make your code more testable.</p>
+<p>A fluent interface is a design pattern that allows you to chain methods (and in our case transformations) together in a way that is easy to read and understand. Leveraging this design pattern can make your code more readable, easier to maintain, and easier to version control. Those are not the only benefits, using a fluent interface, along with "unit transformations" can make your code more testable.</p>
 <p>Let's look at an example. In the following example, I have created a simple data model for a ticket reseller. The data model is simple, and contains three tables:</p>
 <ul>
 <li>Users: The users table contains information about the users of the platform.</li>
@@ -1266,34 +1266,82 @@ a bit technical, and not really to the point. So I decided to write this post to
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Users dataframe
-+-------+----------+---------+--------------------+----------+-----------------+
-|user_id|first_name|last_name|email               |last_login|subscription_tier|
-+-------+----------+---------+--------------------+----------+-----------------+
-|13726  |Joseph    |Mack     |daniel06@example.net|2023-08-07|Standard         |
-|89338  |Melissa   |Moore    |ann32@example.org   |2023-06-19|Prime            |
-|156657 |Nicholas  |Smith    |cgarcia@example.org |2023-09-17|Prime            |
-+-------+----------+---------+--------------------+----------+-----------------+
++-------+----------+---------+--------------------------+----------+-----------------+
+|user_id|first_name|last_name|email                     |last_login|subscription_tier|
++-------+----------+---------+--------------------------+----------+-----------------+
+|192669 |Kristina  |Adams    |barry06@example.com       |2023-02-22|Standard         |
+|122470 |Emma      |Rodriguez|michaelgarrett@example.net|2023-08-03|Prime            |
+|174814 |Joanna    |Long     |debra75@example.net       |2023-08-26|Standard         |
++-------+----------+---------+--------------------------+----------+-----------------+
 only showing top 3 rows
 
 Tickets dataframe
-+----------+--------------+-------+-------------+---------+
-|ticket_no |event_id      |user_id|total_charged|surcharge|
-+----------+--------------+-------+-------------+---------+
-|9957101488|eid_MPlU-54882|118225 |513.25       |11.99    |
-|967991971 |eid_JvhR-30831|141011 |250.34       |0.0      |
-|5662180548|eid_TqKz-24766|168873 |46.43        |0.0      |
-+----------+--------------+-------+-------------+---------+
++----------+--------------+-------+-----------------------------+
+|ticket_no |event_id      |user_id|ticket_receipt               |
++----------+--------------+-------+-----------------------------+
+|1792862058|eid_bZzm-20159|139930 |{178.41, 5.99, 0.05, 11.99}  |
+|3187359773|eid_tEoX-75047|178068 |{799.73, 5.99, 0.0925, 11.99}|
+|6370507564|eid_KGDp-61012|97725  |{512.87, 11.99, 0.05, 5.99}  |
++----------+--------------+-------+-----------------------------+
 only showing top 3 rows
 
 Events dataframe
-+--------------+------------------+----------+--------------+------------+
-|event_id      |event_name        |event_date|event_location|event_result|
-+--------------+------------------+----------+--------------+------------+
-|eid_BRqB-98032|Coldplay          |2022-12-24|Morganhaven   |succesfull  |
-|eid_IoFo-28520|James Taylor      |2020-11-16|Port Vanessa  |succesfull  |
-|eid_KTrZ-91270|The Rolling Stones|2023-04-11|Lake Yolanda  |succesfull  |
-+--------------+------------------+----------+--------------+------------+
++--------------+----------+----------+---------------------+------------+
+|event_id      |event_name|event_date|event_location       |event_result|
++--------------+----------+----------+---------------------+------------+
+|eid_orSA-66209|The Police|2020-10-20|Port Jessica         |succesfull  |
+|eid_JkoP-96029|The Eagles|2021-09-28|South Christopherside|succesfull  |
+|eid_WUpA-94105|The Cure  |2021-05-20|New Jennifer         |cancelled   |
++--------------+----------+----------+---------------------+------------+
 only showing top 3 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note: that tickets_df contains a nested struct called <code>ticket_receipt</code> that contains information about the ticket purchase, such as tax, fees, surcharge, etc.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tickets_df</span><span class="o">.</span><span class="n">printSchema</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>root
+ |-- ticket_no: long (nullable = true)
+ |-- event_id: string (nullable = true)
+ |-- user_id: long (nullable = true)
+ |-- ticket_receipt: struct (nullable = false)
+ |    |-- total_charged: double (nullable = true)
+ |    |-- surcharge: double (nullable = true)
+ |    |-- taxes: double (nullable = true)
+ |    |-- hot_ticket_fees: double (nullable = true)
 
 </pre>
 </div>
@@ -1310,34 +1358,63 @@ only showing top 3 rows
 <p>Let's start by listing the transformations, so that we can build our ETL pipeline in a fluent way.</p>
 <ul>
 <li>1.) Filter events between two dates, that were marked <code>successful</code> and not cancelled (these were refunded)</li>
-<li>2.) Join events and tickets on event_id to grab the total charge and surcharge.</li>
-<li>3.) Join events and users on user_id to grab the subscription tiers.</li>
-<li>4.) Group by events, and subscription tier and sum to get the total revenue and surcharge for subscription tier <code>standard</code>.</li>
+<li>2.) Join events and tickets on event_id to grab ticket charges.</li>
+<li>3.) Expand the receipt data (this is a nested struct column) to get the ticket charges and types for each ticket, and impute <code>nulls</code> for surcharge and hot_ticket_fees.</li>
+<li>4.) Join events and users on user_id to grab the subscription tiers.</li>
+<li>5.) Group by events, and subscription tier and sum to get the total revenue, and fees + sucharge as (fee_charges) for subscription tiers pivoted.</li>
 </ul>
 
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="The-Transformations:">The Transformations:<a class="anchor-link" href="#The-Transformations:">&#182;</a></h3><p>Knowing what we previously summarize, a great way to build this ETL pipeline using <code>The Fluent Interface</code> is to break the pipeline above into four separate transformations</p>
+<ul>
+<li>1.) <code>filter_events()</code></li>
+<li>2.) <code>explode_ticket_receipt()</code></li>
+<li>3.) <code>agg_revenue()</code></li>
+<li>4.) <code>format_and_round()</code></li>
+</ul>
+<p>With all functions named intuitively to reflect the operations performed on the dataframe within each respective function. We'll be using the <code>transform()</code> method to apply each of these functions to the dataframe, and chain them together to get an intuitive, and readable ETL pipeline.
+You can read more about the <code>.transform()</code> method using the PySpark Dataframe API <a href="https://spark.apache.org/docs/3.1.3/api/python/reference/api/pyspark.sql.DataFrame.transform.html">here</a>.</p>
+<p>Note the function <code>filter_events()</code> is a bit different than the others. This function takes two parameters, <code>start_date</code> and <code>end_date</code>. This is because we want to be able to filter the events dataframe by any date range. The other functions do not take any parameters, and are designed to be used in a fluent way. The parameters are passed into a nested function called _df which is then used to filter the dataframe. This was a common approach that lent itself to building a more 'aesethically pleasing' pipeline. However, you can take another approach and use .transform() to pass in parameters to the functions, <em>without</em> using nested functions.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[108]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">DataFrame</span>
-<span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">DateType</span>
-<span class="kn">import</span> <span class="nn">pyspark.sql.functions</span> <span class="k">as</span> <span class="nn">F</span>
-
-<span class="k">def</span> <span class="nf">filter_events</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">filter_events</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">,</span> <span class="n">result_event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">_df</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
                 <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;event_date&#39;</span><span class="p">)</span>
                           <span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">))</span>
-                  <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;event_result&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;succesfull&#39;</span><span class="p">)</span>
+                  <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;event_result&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">result_event</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">_df</span>
 
+<span class="k">def</span> <span class="nf">explode_ticket_receipt</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;ticket_receipt.*&quot;</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;ticket_receipt&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;surcharge&quot;</span><span class="p">,</span> <span class="s2">&quot;hot_ticket_fees&quot;</span><span class="p">])</span>
+    <span class="p">)</span>
+
 <span class="k">def</span> <span class="nf">agg_revenue</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">groupBy</span><span class="p">([</span><span class="s1">&#39;event_id&#39;</span><span class="p">,</span><span class="s1">&#39;event_name&#39;</span><span class="p">,</span> <span class="s1">&#39;subscription_tier&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s1">&#39;total_charged&#39;</span><span class="p">:</span> <span class="s1">&#39;sum&#39;</span><span class="p">,</span> <span class="s1">&#39;surcharge&#39;</span><span class="p">:</span> <span class="s1">&#39;sum&#39;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;fees_charged&quot;</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;surcharge&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;hot_ticket_fees&quot;</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="s2">&quot;event_id&quot;</span><span class="p">,</span> <span class="s2">&quot;event_name&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s2">&quot;subscription_tier&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="s2">&quot;fees_charged&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;fees_charges&quot;</span><span class="p">))</span>
+            
+    <span class="p">)</span>
+<span class="k">def</span> <span class="nf">format_and_round</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;Prime&quot;</span><span class="p">,</span><span class="n">F</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="s2">&quot;Prime&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;Standard&quot;</span><span class="p">,</span><span class="n">F</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="s2">&quot;Standard&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">subset</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Prime&quot;</span><span class="p">,</span> <span class="s2">&quot;Standard&quot;</span><span class="p">]))</span>
 </pre></div>
 
     </div>
@@ -1345,81 +1422,30 @@ only showing top 3 rows
 </div>
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[111]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">events_df</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">filter_events</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="s1">&#39;2021-01-01&#39;</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="s1">&#39;2021-12-31&#39;</span><span class="p">))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[111]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>DataFrame[event_id: string, event_name: string, event_date: date, event_location: string, event_result: string]</pre>
-</div>
-
-</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="The-pipeline:">The pipeline:<a class="anchor-link" href="#The-pipeline:">&#182;</a></h3><p>Now that we have broken up each tranformation step, writing the pipeline is easy. All we have to do is chain the functions together using the <code>.transform()</code> method. like so:</p>
 
 </div>
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_revenue</span><span class="p">(</span>
-    <span class="n">events</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
-    <span class="n">tickets</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
-    <span class="n">users</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
-    <span class="n">start_date</span><span class="p">:</span> <span class="n">DateType</span><span class="p">,</span>
-    <span class="n">end_date</span><span class="p">:</span> <span class="n">DateType</span><span class="p">,</span>
-    <span class="n">event_result</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">subscription_tier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">agg_report</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">tickets_df</span>
+    <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">explode_ticket_receipt</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">events_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;event_id&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">filter_events</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2021-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;succesfull&quot;</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">users_df</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">agg_revenue</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">format_and_round</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">agg_report</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     
-    <span class="n">events</span><span class="o">.</span><span class="n">transform</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[58]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">_df</span><span class="p">():</span>
-    <span class="k">return</span> <span class="s2">&quot;hello&quot;</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[59]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">_df</span>
 </pre></div>
 
     </div>
@@ -1432,17 +1458,180 @@ only showing top 3 rows
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[59]:</div>
+    <div class="prompt"></div>
 
 
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+--------------+----------------+-------+--------+
+|event_id      |event_name      |Prime  |Standard|
++--------------+----------------+-------+--------+
+|eid_orSA-66209|The Police      |1023.04|1081.16 |
+|eid_aflN-99103|Oasis           |1116.12|1042.84 |
+|eid_yDVG-17387|Blue Oyster Cult|967.19 |995.85  |
++--------------+----------------+-------+--------+
+only showing top 3 rows
 
-
-<div class="output_text output_subarea output_execute_result">
-<pre>&lt;function __main__._df()&gt;</pre>
+</pre>
+</div>
 </div>
 
 </div>
+</div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If we plan on using this pipeline multiple times, we can create a function that takes the start and end dates as parameters and returns the aggregated report.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_revenue_tiers</span><span class="p">(</span>
+    <span class="n">tickets_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">events_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">users_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">start_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">end_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">tickets_df</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">explode_ticket_receipt</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">events_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;event_id&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">filter_events</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2021-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;succesfull&quot;</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">users_df</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">agg_revenue</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">format_and_round</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="n">report_result_df</span> <span class="o">=</span> <span class="n">get_revenue_tiers</span><span class="p">(</span>
+    <span class="n">tickets_df</span><span class="p">,</span>
+    <span class="n">events_df</span><span class="p">,</span>
+    <span class="n">users_df</span><span class="p">,</span>
+    <span class="n">start_date</span><span class="o">=</span><span class="s2">&quot;2022-07-01&quot;</span><span class="p">,</span>
+    <span class="n">end_date</span> <span class="o">=</span> <span class="s2">&quot;2023-01-01&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">report_result_df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+--------------+----------------+-------+--------+
+|event_id      |event_name      |Prime  |Standard|
++--------------+----------------+-------+--------+
+|eid_orSA-66209|The Police      |1023.04|1081.16 |
+|eid_aflN-99103|Oasis           |1116.12|1042.84 |
+|eid_yDVG-17387|Blue Oyster Cult|967.19 |995.85  |
++--------------+----------------+-------+--------+
+only showing top 3 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Testing-your-transformations">Testing your transformations<a class="anchor-link" href="#Testing-your-transformations">&#182;</a></h3><p>One of the benefits of writing your ETL using the fluent interface, is that you can write tests for each of your transformations. This allows you to test each transformation in isolation, and ensure that the output is what you expect. This will help immensely when debugging your ETL pipeline.
+In the following example I have created a test for the <code>explode_ticket_receipt()</code> function. This test will ensure that the function returns the correct number of rows, and columns, and that the resulting data after the transformation is what we expect.</p>
+<p>For the sake of brevity, I have not written tests for each of our four transformations, but I think this serves as a good illustration of how to handle testing your transformations. In the code below, I am collecting and checking whether the resulting dataframe is what we expect. If it is, it returns true. Of course you wouldn't want to do this in your test suite, you would want to use the <code>assertDataFrameEqual</code> function from the <code>pyspark.testing.utils</code> utils, if you plan to design your test suite using <code>pytest</code></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">SparkSession</span><span class="p">,</span> <span class="n">Row</span>
+<span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">StructType</span><span class="p">,</span> <span class="n">StructField</span><span class="p">,</span> <span class="n">IntegerType</span><span class="p">,</span> <span class="n">FloatType</span><span class="p">,</span> <span class="n">StringType</span>
+
+
+<span class="k">def</span> <span class="nf">test_explode_ticket_receipt</span><span class="p">(</span><span class="n">spark</span><span class="p">):</span>
+  
+  <span class="n">test_data</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;ticket_no&#39;</span><span class="p">:</span> <span class="mi">100001</span><span class="p">,</span>
+  <span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="s1">&#39;eid_bZzm-20159&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="mi">200001</span><span class="p">,</span>
+  <span class="s1">&#39;ticket_receipt&#39;</span><span class="p">:</span> <span class="n">Row</span><span class="p">(</span><span class="n">total_charged</span><span class="o">=</span><span class="mf">900.00</span><span class="p">,</span> <span class="n">surcharge</span><span class="o">=</span><span class="mf">8.99</span><span class="p">,</span> <span class="n">taxes</span><span class="o">=</span><span class="mf">9.15</span><span class="p">,</span> <span class="n">hot_ticket_fees</span><span class="o">=</span><span class="kc">None</span><span class="p">)},</span>
+<span class="p">{</span><span class="s1">&#39;ticket_no&#39;</span><span class="p">:</span> <span class="mi">100002</span><span class="p">,</span>
+  <span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="s1">&#39;eid_tEoX-75047&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="mi">200002</span><span class="p">,</span>
+  <span class="s1">&#39;ticket_receipt&#39;</span><span class="p">:</span> <span class="n">Row</span><span class="p">(</span><span class="n">total_charged</span><span class="o">=</span><span class="mf">799.73</span><span class="p">,</span> <span class="n">surcharge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">taxes</span><span class="o">=</span><span class="mf">0.0925</span><span class="p">,</span> <span class="n">hot_ticket_fees</span><span class="o">=</span><span class="mf">11.99</span><span class="p">)},</span>
+<span class="p">{</span><span class="s1">&#39;ticket_no&#39;</span><span class="p">:</span> <span class="mi">100003</span><span class="p">,</span>
+  <span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="s1">&#39;eid_KGDp-61012&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="mi">200003</span><span class="p">,</span>
+  <span class="s1">&#39;ticket_receipt&#39;</span><span class="p">:</span> <span class="n">Row</span><span class="p">(</span><span class="n">total_charged</span><span class="o">=</span><span class="mf">512.87</span><span class="p">,</span> <span class="n">surcharge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">taxes</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">hot_ticket_fees</span><span class="o">=</span><span class="kc">None</span><span class="p">)},</span>
+<span class="p">{</span><span class="s1">&#39;ticket_no&#39;</span><span class="p">:</span> <span class="mi">100003</span><span class="p">,</span>
+  <span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="s1">&#39;eid_KGDp-61012&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="mi">200004</span><span class="p">,</span>
+  <span class="s1">&#39;ticket_receipt&#39;</span><span class="p">:</span> <span class="n">Row</span><span class="p">(</span><span class="n">total_charged</span><span class="o">=</span><span class="mf">512.87</span><span class="p">,</span> <span class="n">surcharge</span><span class="o">=</span><span class="mf">160.75</span><span class="p">,</span> <span class="n">taxes</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">hot_ticket_fees</span><span class="o">=</span><span class="mf">19.95</span><span class="p">)}]</span>
+  
+  <span class="n">result_df</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="s1">&#39;eid_bZzm-20159&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ticket_no&#39;</span><span class="p">:</span> <span class="mi">100001</span><span class="p">,</span>
+    <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="mi">200001</span><span class="p">,</span>
+    <span class="s1">&#39;total_charged&#39;</span><span class="p">:</span> <span class="mf">900.0</span><span class="p">,</span>
+    <span class="s1">&#39;surcharge&#39;</span><span class="p">:</span> <span class="mf">8.99</span><span class="p">,</span>
+    <span class="s1">&#39;taxes&#39;</span><span class="p">:</span> <span class="mf">9.15</span><span class="p">,</span>
+    <span class="s1">&#39;hot_ticket_fees&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+  <span class="p">{</span><span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="s1">&#39;eid_tEoX-75047&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ticket_no&#39;</span><span class="p">:</span> <span class="mi">100002</span><span class="p">,</span>
+    <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="mi">200002</span><span class="p">,</span>
+    <span class="s1">&#39;total_charged&#39;</span><span class="p">:</span> <span class="mf">799.73</span><span class="p">,</span>
+    <span class="s1">&#39;surcharge&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s1">&#39;taxes&#39;</span><span class="p">:</span> <span class="mf">0.0925</span><span class="p">,</span>
+    <span class="s1">&#39;hot_ticket_fees&#39;</span><span class="p">:</span> <span class="mf">11.99</span><span class="p">},</span>
+  <span class="p">{</span><span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="s1">&#39;eid_KGDp-61012&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ticket_no&#39;</span><span class="p">:</span> <span class="mi">100003</span><span class="p">,</span>
+    <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="mi">200003</span><span class="p">,</span>
+    <span class="s1">&#39;total_charged&#39;</span><span class="p">:</span> <span class="mf">512.87</span><span class="p">,</span>
+    <span class="s1">&#39;surcharge&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s1">&#39;taxes&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="s1">&#39;hot_ticket_fees&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+  <span class="p">{</span><span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="s1">&#39;eid_KGDp-61012&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ticket_no&#39;</span><span class="p">:</span> <span class="mi">100003</span><span class="p">,</span>
+    <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="mi">200004</span><span class="p">,</span>
+    <span class="s1">&#39;total_charged&#39;</span><span class="p">:</span> <span class="mf">512.87</span><span class="p">,</span>
+    <span class="s1">&#39;surcharge&#39;</span><span class="p">:</span> <span class="mf">160.75</span><span class="p">,</span>
+    <span class="s1">&#39;taxes&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+  <span class="s1">&#39;hot_ticket_fees&#39;</span><span class="p">:</span> <span class="mf">19.95</span><span class="p">}]</span>
+  
+  <span class="n">test_df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
+  <span class="n">result_df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">result_df</span><span class="p">)</span>
+  
+  <span class="n">test_df</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">explode_ticket_receipt</span><span class="p">)</span>
+  
+  <span class="n">result_df</span> <span class="o">=</span> <span class="n">result_df</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s2">&quot;ticket_no&quot;</span><span class="p">,</span> <span class="s2">&quot;event_id&quot;</span><span class="p">)</span>
+  <span class="n">test_df</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s2">&quot;ticket_no&quot;</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span><span class="p">)</span>
+  
+  <span class="n">result_df</span> <span class="o">=</span> <span class="n">result_df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">test_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="c1"># reorder columns to match</span>
+  <span class="k">return</span> <span class="n">result_df</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span> <span class="o">==</span> <span class="n">test_df</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span> <span class="c1"># **don&#39;t** do this for large data</span>
+  <span class="c1">#ssertDataFrameEqual(result_df, test_df) # do this for large data</span>
+</pre></div>
+
+    </div>
 </div>
 </div>
 
@@ -1452,13 +1641,41 @@ only showing top 3 rows
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_explode_ticket_receipt</span><span class="p">(</span><span class="n">spark</span><span class="p">)</span>
 </pre></div>
 
     </div>
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[&nbsp;]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>True</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Conclusion:">Conclusion:<a class="anchor-link" href="#Conclusion:">&#182;</a></h3><p>In this post, we learned about the Fluent Interface design pattern, and how we can use it to build a readable, and intuitive ETL pipeline. We also learned about some of the benefits of using this design pattern, such as making our code more testable, easier to maintain, debug and version control. We did that by looking at a sample data model, and a simple theoretical use case for an ETL pipeline. We then broke down the pipeline into three separate transformations, and built the pipeline using the <code>.transform()</code> method (along with some joins to add pertinent data). Furthermore, we gave a simple example of how you could make this pipeline more reusable by creating a function that takes the start and end dates as parameters, and returns the aggregated report. Finally, we discussed some of the benefits of using this design pattern, such as making our code more testable, and gave a sample test case for the <code>explode_ticket_receipt()</code> function.</p>
+
+</div>
+</div>
 </div>
  
 
